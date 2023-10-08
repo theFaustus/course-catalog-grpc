@@ -1,5 +1,3 @@
-
-
 spring:
   data:
     r2dbc:
@@ -43,10 +41,18 @@ management:
     readinessstate:
       enabled: true
 
+grpc:
+  client:
+    courses-service:
+      address: 'static://127.0.0.1:9090'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+
 logging:
   level:
     inc.evil: DEBUG
     io.r2dbc.postgresql.QUERY: DEBUG # for queries
     io.r2dbc.postgresql.PARAM: DEBUG # for parameters
 server:
-  port: 8082
+  port: 8022

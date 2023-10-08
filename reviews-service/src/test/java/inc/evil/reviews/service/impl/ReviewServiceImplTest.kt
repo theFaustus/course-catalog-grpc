@@ -1,15 +1,15 @@
 package inc.evil.reviews.service.impl
 
+import inc.evil.courses.api.dto.CourseApiResponse
 import inc.evil.courses.api.web.dto.CourseApiResponse
 import inc.evil.courses.api.web.dto.InstructorApiResponse
 import inc.evil.reviews.common.fixtures.ReviewFixture
 import inc.evil.reviews.repo.ReviewRepository
 import inc.evil.reviews.service.ReviewService
-import inc.evil.reviews.service.hazelcast.GetCourseByIdCallable
 import inc.evil.reviews.service.hazelcast.HazelcastGateway
+import inc.evil.reviews.service.hazelcast.tasks.GetCourseByIdTask
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito.*
@@ -55,7 +55,7 @@ internal class ReviewServiceImplTest {
         val courseApiResponse = CourseApiResponse(1, "name", "category", "java", "desc", "date", "date", instructor)
 
         `when`(reviewRepository.save(review)).thenReturn(Mono.just(review))
-        whenever(hazelcastGateway.execute(org.mockito.kotlin.any<GetCourseByIdCallable>())).thenReturn(courseApiResponse)
+        whenever(hazelcastGateway.execute(org.mockito.kotlin.any<GetCourseByIdTask>())).thenReturn(courseApiResponse)
 
         runBlocking {
             Assertions.assertThat(reviewService.save(review)).isEqualTo(review)

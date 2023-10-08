@@ -27,7 +27,6 @@ class HazelcastConfiguration {
         config.networkConfig.isPortAutoIncrement = true
         config.networkConfig.join.multicastConfig.isEnabled = true
         config.networkConfig.join.multicastConfig.multicastPort = 5777
-        config.userCodeDeploymentConfig.isEnabled = true
         config.configureWikipediaSummaries()
         return config
     }

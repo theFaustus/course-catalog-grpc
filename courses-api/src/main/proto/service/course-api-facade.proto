@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+import "google/protobuf/wrappers.proto";
+import "instructor-api-response.proto";
+import "course-api-response.proto";
+package service;
+
+option java_multiple_files = true;
+option java_package = 'inc.evil.courses.api.facade';
+
+service CourseApiFacade {
+  rpc findAll (Empty) returns (CourseApiResponseList);
+  rpc findById (FindCourseByIdRequest) returns (CourseApiResponse);
+}
+
+message Empty {}

@@ -20,7 +20,7 @@ repositories {
     }
 }
 dependencies {
-    implementation("inc.evil:courses-api:1.1")
+    implementation("inc.evil:courses-api-grpc:1.1")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
@@ -38,6 +38,16 @@ dependencies {
     implementation("org.apache.pdfbox:pdfbox:2.0.27")
     implementation("com.hazelcast:hazelcast:5.2.1")
     implementation("com.hazelcast:hazelcast-spring:5.2.1")
+    implementation("net.devh:grpc-client-spring-boot-starter:2.15.0.RELEASE")
+    if (JavaVersion.current().isJava9Compatible) {
+        // Workaround for @javax.annotation.Generated
+        // see: https://github.com/grpc/grpc-java/issues/3633
+        implementation("javax.annotation:javax.annotation-api:1.3.1")
+    }
+    implementation("com.google.protobuf:protobuf-java:3.24.4")
+    implementation("com.google.protobuf:protobuf-java-util:3.24.4")
+    implementation("io.grpc:grpc-protobuf:1.58.0")
+    implementation("io.grpc:grpc-stub:1.58.0")
 
     runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.6.4")
     runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.6.4")

@@ -37,6 +37,16 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("com.hazelcast:hazelcast:5.2.1")
     implementation("com.hazelcast:hazelcast-spring:5.2.1")
+    implementation("net.devh:grpc-server-spring-boot-starter:2.15.0.RELEASE")
+    if (JavaVersion.current().isJava9Compatible) {
+        // Workaround for @javax.annotation.Generated
+        // see: https://github.com/grpc/grpc-java/issues/3633
+        implementation("javax.annotation:javax.annotation-api:1.3.1")
+    }
+    implementation("com.google.protobuf:protobuf-java:3.24.4")
+    implementation("com.google.protobuf:protobuf-java-util:3.24.4")
+    implementation("io.grpc:grpc-protobuf:1.58.0")
+    implementation("io.grpc:grpc-stub:1.58.0")
 
     implementation("org.apache.avro:avro:1.11.0") {
         exclude("org.slf4j")

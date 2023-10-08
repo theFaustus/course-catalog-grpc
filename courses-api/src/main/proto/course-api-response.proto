@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+import "google/protobuf/wrappers.proto";
+import "instructor-api-response.proto";
+
+option java_multiple_files = true;
+option java_package = 'inc.evil.courses.api.dto';
+
+
+message CourseApiResponse {
+  int32 id = 1;
+  string name = 2;
+  string category = 3;
+  string programming_language = 4;
+  string programming_language_description = 5;
+  string created_at = 6;
+  string updated_at = 7;
+  InstructorApiResponse instructor = 8;
+}
+
+message FindCourseByIdRequest {
+  int32 id = 1;
+}
+
+message CourseApiResponseList {
+  repeated CourseApiResponse courses = 1;
+}

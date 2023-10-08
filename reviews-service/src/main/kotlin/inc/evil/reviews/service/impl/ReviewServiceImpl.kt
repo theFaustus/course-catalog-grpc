@@ -1,14 +1,15 @@
 package inc.evil.reviews.service.impl
 
-import inc.evil.courses.api.web.dto.CourseApiResponse
+import inc.evil.courses.api.dto.CourseApiResponse
+import inc.evil.courses.api.dto.FindCourseByIdRequest
+import inc.evil.courses.api.facade.CourseApiFacadeGrpc.CourseApiFacadeBlockingStub
 import inc.evil.reviews.common.exceptions.NotFoundException
 import inc.evil.reviews.model.Review
 import inc.evil.reviews.repo.ReviewRepository
 import inc.evil.reviews.service.ReviewService
-import inc.evil.reviews.service.hazelcast.GetCourseByIdCallable
-import inc.evil.reviews.service.hazelcast.HazelcastGateway
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrNull
+import net.devh.boot.grpc.client.inject.GrpcClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -17,7 +18,10 @@ import java.time.LocalDate
 
 @Service
 @Transactional
-class ReviewServiceImpl(val reviewRepository: ReviewRepository, val hazelcastGateway: HazelcastGateway) : ReviewService {
+class ReviewServiceImpl(val reviewRepository: ReviewRepository) : ReviewService {
+
+    @GrpcClient("courses-service")
+    private lateinit var courseApiFacade: CourseApiFacadeBlockingStub
 
     companion object {
         private val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -33,7 +37,7 @@ class ReviewServiceImpl(val reviewRepository: ReviewRepository, val hazelcastGat
 
     override suspend fun save(review: Review): Review {
         runCatching {
-            hazelcastGateway.execute(GetCourseByIdCallable(review.courseId!!)).also { log.info("Call to hazelcast ended with $it") }
+            courseApiFacade.findById(FindCourseByIdRequest.newBuilder().setId(review.courseId!!).build()).also { log.info("gRPC call ended with $it") }
         }.getOrNull() ?: throw NotFoundException(CourseApiResponse::class, "course_id", review.courseId.toString())
         return reviewRepository.save(review).awaitFirst()
     }

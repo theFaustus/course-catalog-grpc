@@ -26,13 +26,13 @@ class GraphQLExceptionHandler : DataFetcherExceptionResolverAdapter() {
 
     override fun resolveToSingleError(e: Throwable, env: DataFetchingEnvironment): GraphQLError? {
         return when (e) {
-            is ValidationException -> toGraphQLError(e)
-            is NotFoundException -> toGraphQLError(e)
-            is MissingServletRequestParameterException -> toGraphQLError(e)
+            is ValidationException -> toGraphQLError(e, env)
+            is NotFoundException -> toGraphQLError(e, env)
+            is MissingServletRequestParameterException -> toGraphQLError(e, env)
             is MethodArgumentNotValidException -> handleMethodArgumentNotValidException(e)
             is ConstraintViolationException -> handleConstraintViolationException(e)
             is MethodArgumentTypeMismatchException -> handleMethodArgumentTypeMismatchException(e)
-            is Exception -> toGraphQLError(e)
+            is Exception -> toGraphQLError(e, env)
             else -> super.resolveToSingleError(e, env)
         }
     }
@@ -45,10 +45,15 @@ class GraphQLExceptionHandler : DataFetcherExceptionResolverAdapter() {
         return GraphqlErrorBuilder.newError().message(message).errorType(ErrorType.DataFetchingException).build()
     }
 
-    private fun toGraphQLError(e: Throwable): GraphQLError? {
-        log.warn("Exception while handling request: ${e.message}", e)
-        return GraphqlErrorBuilder.newError().message(e.message).errorType(ErrorType.DataFetchingException).build()
+    private fun toGraphQLError(e: Throwable, env: DataFetchingEnvironment): GraphQLError? {
+        log.warn("Exception while fetching data (${env.executionStepInfo.path}) at ${env.field.sourceLocation}: ${e.message}", e)
+        return GraphqlErrorBuilder.newError()
+            .message(e.message)
+            .location(env.field.sourceLocation)
+            .path(env.executionStepInfo.path)
+            .errorType(ErrorType.DataFetchingException).build()
     }
+
 
     private fun handleConstraintViolationException(e: ConstraintViolationException): GraphQLError? {
         val errorMessages = mutableSetOf<String>()

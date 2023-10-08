@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+import "google/protobuf/wrappers.proto";
+
+option java_multiple_files = true;
+option java_package = 'inc.evil.courses.api.dto';
+
+message InstructorApiResponse {
+  int32 id = 1;
+  string name = 2;
+  string summary = 3;
+  string description = 4;
+}
