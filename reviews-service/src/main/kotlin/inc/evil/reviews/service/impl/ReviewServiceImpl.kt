@@ -2,11 +2,12 @@ package inc.evil.reviews.service.impl
 
 import inc.evil.courses.api.dto.CourseApiResponse
 import inc.evil.courses.api.dto.FindCourseByIdRequest
-import inc.evil.courses.api.facade.CourseApiFacadeGrpc.CourseApiFacadeBlockingStub
+import inc.evil.courses.api.facade.CourseApiFacadeGrpc.CourseApiFacadeFutureStub
 import inc.evil.reviews.common.exceptions.NotFoundException
 import inc.evil.reviews.model.Review
 import inc.evil.reviews.repo.ReviewRepository
 import inc.evil.reviews.service.ReviewService
+import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import net.devh.boot.grpc.client.inject.GrpcClient
@@ -21,7 +22,7 @@ import java.time.LocalDate
 class ReviewServiceImpl(val reviewRepository: ReviewRepository) : ReviewService {
 
     @GrpcClient("courses-service")
-    private lateinit var courseApiFacade: CourseApiFacadeBlockingStub
+    private lateinit var courseApiFacade: CourseApiFacadeFutureStub
 
     companion object {
         private val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -37,7 +38,7 @@ class ReviewServiceImpl(val reviewRepository: ReviewRepository) : ReviewService 
 
     override suspend fun save(review: Review): Review {
         runCatching {
-            courseApiFacade.findById(FindCourseByIdRequest.newBuilder().setId(review.courseId!!).build()).also { log.info("gRPC call ended with $it") }
+            courseApiFacade.findById(FindCourseByIdRequest.newBuilder().setId(review.courseId!!).build()).await().also { log.info("gRPC call ended with $it") }
         }.getOrNull() ?: throw NotFoundException(CourseApiResponse::class, "course_id", review.courseId.toString())
         return reviewRepository.save(review).awaitFirst()
     }
